@@ -34,12 +34,15 @@ scalacOptions  += "-Ywarn-value-discard"
 scalacOptions in (Compile, console) -= "-Ywarn-unused-import"
 scalacOptions in (Test,    console) -= "-Ywarn-unused-import"
 
+libraryDependencies += "org.scalameta"   %% "scalameta" % "1.0.0"
+libraryDependencies += "org.scalamacros"  % "paradise"  % "3.0.0-M3" fullCrossCompilerPlugin()
+
 parallelExecution in Test := false // so printlns don't interwine
 
          fork in run := true
 cancelable in Global := true
 
-libraryDependencies += "org.scalameta" %% "scalameta" % "1.0.0"
+
 
 noDocs
 noArtifacts // for now
