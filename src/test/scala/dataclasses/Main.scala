@@ -5,5 +5,6 @@ object Main {
     println(new Bippy1(1))
     println(new Bippy1(1).hashCode())
     println(new Bippy1(1).equals(new Bippy1(1)))
+    println(new Bippy1(1).foo)
   }
 }
