@@ -62,7 +62,7 @@ object MiscPlugin extends AutoPlugin {
     }
 
     implicit final class ModuleIDWithCompilerPlugin(val _m: ModuleID) extends AnyVal {
-      def fullCrossCompilerPlugin(): ModuleID = sbt.compilerPlugin(_m cross CrossVersion.full)
+      def compilerPlugin(): ModuleID = sbt.compilerPlugin(_m cross CrossVersion.full)
     }
   }
   import autoImport._
