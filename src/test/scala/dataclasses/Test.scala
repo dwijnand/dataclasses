@@ -1,5 +1,6 @@
 package dataclasses
 
-@main object Test {
+//@main
+object Test {
   println("hello world")
 }
