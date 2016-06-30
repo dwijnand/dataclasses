@@ -2,7 +2,7 @@ package dataclasses
 
 import scala.meta._
 
-import scala.collection.immutable
+import scala.collection.immutable.{ Seq => sciSeq }
 
 //@data class Bippy1(foo: Int)
 
@@ -27,10 +27,10 @@ class data extends scala.annotation.StaticAnnotation {
     val ProductImpl  = q"_root_.dataclasses.ProductImpl"
     val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
 
-    val params: immutable.Seq[Term.Param] = paramss.head
-    val newParams1 = params.map(param =>
-      if (param.mods exists { case mod"valparam" => true; case _ => false }) param
-      else param.copy(mods = param.mods :+ mod"valparam")
+    val params1: sciSeq[Term.Param] = paramss.head
+    val newParams1 = params1.map(param =>
+      if (param.mods exists { case Mod.ValParam() => true; case _ => false }) param
+      else param.copy(mods = param.mods :+ Mod.ValParam())
     )
     val newParamss = newParams1 +: paramss.tail
 
