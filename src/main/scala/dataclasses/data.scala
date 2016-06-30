@@ -24,10 +24,10 @@ class data extends scala.annotation.StaticAnnotation {
     val q"..$mods class $tname[..$tparams](...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
-    val termScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
-    val AnyRef           = t"_root_.scala.AnyRef"
-    val ProductImpl      = q"_root_.dataclasses.ProductImpl"
-    val IndexedSeq       = q"_root_.scala.collection.immutable.IndexedSeq"
+    val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
+    val AnyRef       = t"_root_.scala.AnyRef"
+    val ProductImpl  = q"_root_.dataclasses.ProductImpl"
+    val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
 
     val newMods = mods withMod Mod.Final()
 
@@ -58,10 +58,10 @@ class data extends scala.annotation.StaticAnnotation {
       copyBody
     )
 
-    val toString = q"override def toString = $termScalaRunTime._toString(asProduct)"
-    val hashCode = q"override def hashCode = $termScalaRunTime._hashCode(asProduct)"
+    val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
+    val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
     val equals = q"""override def equals(that: _root_.scala.Any) = (this eq that.asInstanceOf[$AnyRef]) || (that match {
-      case that: $tname => $termScalaRunTime._equals(this.asProduct, that.asProduct)
+      case that: $tname => $ScalaRunTime._equals(this.asProduct, that.asProduct)
       case _            => false
       })"""
 
