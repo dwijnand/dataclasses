@@ -7,12 +7,6 @@ import scala.runtime.ScalaRunTime
 
 //@data class Bippy1(foo: Int)
 
-//final class Bippy(val foo: Int) {
-//  def withFoo(foo: Int): Bippy = copy(foo = foo)
-//
-//  def copy(foo: Int = foo): Bippy = Bippy(foo)
-//}
-//
 //object Bippy {
 //  def apply(foo: Int): Bippy = new Bippy(foo)
 //}
@@ -45,7 +39,7 @@ class data extends scala.annotation.StaticAnnotation {
 
     val ctorRefName = Ctor.Ref.Name(tnameString)
     val ctorApply = q"$ctorRefName(foo)"
-    val copyBody = Term.New(
+    val ctorNew = Term.New(
       Template(
         Nil,
         sciSeq(ctorApply),
@@ -55,7 +49,7 @@ class data extends scala.annotation.StaticAnnotation {
     )
 
 //  val copy = q"def copy(foo: $Int = foo): $tname = new $tname(foo)"
-    val copy = q"def copy(foo: $Int = foo): $tname = $copyBody"
+    val copy = q"def copy(foo: $Int = foo): $tname = $ctorNew"
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
     val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
@@ -69,7 +63,11 @@ class data extends scala.annotation.StaticAnnotation {
     val newStats = stats ++ withs :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
-    q"..$newMods class $tname[..$tparams] ..$ctorMods (...$newParamss) extends $newTemplate"
+    val classDefn = q"..$newMods class $tname[..$tparams] ..$ctorMods (...$newParamss) extends $newTemplate"
+
+    val objectDef = q"object ${Term.Name(tnameString)} { def apply(foo: Int): $tname = $ctorNew }"
+
+    Term.Block(sciSeq(classDefn, objectDef))
   }
 }
 

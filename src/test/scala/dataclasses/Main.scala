@@ -8,5 +8,6 @@ object Main {
     println(new Bippy1(1).foo)
     println(new Bippy1(1).copy(foo = 2))
     println(new Bippy1(1).withFoo(2))
+    println(Bippy1(1))
   }
 }
