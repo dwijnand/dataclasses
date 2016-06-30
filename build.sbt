@@ -35,6 +35,7 @@ scalacOptions in (Compile, console) -= "-Ywarn-unused-import"
 scalacOptions in (Test,    console) -= "-Ywarn-unused-import"
 
 resolvers += Resolver sonatypeRepo "snapshots"
+cleanKeepFiles ++= Seq("resolution-cache", "streams") map (target.value / _)
 
 dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value // sbt/sbt#2286
 dependencyOverrides += "org.scala-lang" % "scala-library"  % scalaVersion.value
