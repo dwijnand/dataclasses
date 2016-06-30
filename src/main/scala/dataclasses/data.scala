@@ -8,15 +8,6 @@ import scala.meta._
 //  def withFoo(foo: Int): Bippy = copy(foo = foo)
 //
 //  def copy(foo: Int = foo): Bippy = Bippy(foo)
-//
-//  override def toString = scala.runtime.ScalaRunTime._toString(this.asProduct)
-//  override def hashCode = scala.runtime.ScalaRunTime._hashCode(this.asProduct)
-//  override def equals(that: Any) = (this eq that.asInstanceOf[AnyRef]) || (that match {
-//    case that: Bippy => scala.runtime.ScalaRunTime._equals(this.asProduct, that.asProduct)
-//    case _           => false
-//  })
-//
-//  private def asProduct: Product = ProductImpl("Bippy", IndexedSeq(foo))
 //}
 //
 //object Bippy {
