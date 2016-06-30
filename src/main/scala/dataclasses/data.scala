@@ -19,6 +19,7 @@ import scala.collection.immutable.{ Seq => sciSeq }
 class data extends scala.annotation.StaticAnnotation {
   inline def apply(defn: Any) = meta {
     // TODO: Add back the constructor mod
+    // Fixed with https://github.com/scalameta/scalameta/pull/445 and in 1.1.0+
     val q"..$mods class $tname[..$tparams](...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
