@@ -34,6 +34,8 @@ scalacOptions  += "-Ywarn-value-discard"
 scalacOptions in (Compile, console) -= "-Ywarn-unused-import"
 scalacOptions in (Test,    console) -= "-Ywarn-unused-import"
 
+resolvers += Resolver sonatypeRepo "snapshots"
+
 dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value // sbt/sbt#2286
 dependencyOverrides += "org.scala-lang" % "scala-library"  % scalaVersion.value
 dependencyOverrides += "org.scala-lang" % "scala-reflect"  % scalaVersion.value
@@ -42,9 +44,9 @@ dependencyOverrides += "org.scala-lang" % "scalap"         % scalaVersion.value
 val addMacroParadise = settingKey[Boolean]("Helper for https://github.com/scalameta/paradise/issues/10")
 addMacroParadise := true
 
-libraryDependencies += "org.scalameta"   %% "scalameta" % "1.0.0"
+libraryDependencies += "org.scalameta"   %% "scalameta" % "1.1.0-SNAPSHOT"
 libraryDependencies += (
-  if (addMacroParadise.value) Option("org.scalamacros"  % "paradise"  % "3.0.0-M3" compilerPlugin()) else None)
+  if (addMacroParadise.value) Option("org.scalamacros"  % "paradise"  % "3.0.0-SNAPSHOT" compilerPlugin()) else None)
 
 parallelExecution in Test := false // so printlns don't interwine
 
