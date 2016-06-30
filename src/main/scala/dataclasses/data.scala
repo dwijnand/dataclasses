@@ -20,7 +20,6 @@ class data extends scala.annotation.StaticAnnotation {
     val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
     val Any          = t"_root_.scala.Any"
     val AnyRef       = t"_root_.scala.AnyRef"
-    val Int          = t"_root_.scala.Int"
     val Product      = t"_root_.scala.Product"
     val ProductImpl  = q"_root_.dataclasses.ProductImpl"
     val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
@@ -37,6 +36,12 @@ class data extends scala.annotation.StaticAnnotation {
       q"def $withName($name: $decltpe = $name): $tname = copy($name = $name)"
     }
 
+    val copyParams = params1 map { p =>
+      val name @ Term.Name(_) = p.name
+      val Some(decltpe) = p.decltpe
+      param"$name: $decltpe = $name"
+    }
+
     val ctorRefName = Ctor.Ref.Name(tnameString)
     val ctorApply = q"$ctorRefName(foo)"
     val ctorNew = Term.New(
@@ -48,8 +53,8 @@ class data extends scala.annotation.StaticAnnotation {
       )
     )
 
-//  val copy = q"def copy(foo: $Int = foo): $tname = new $tname(foo)"
-    val copy = q"def copy(foo: $Int = foo): $tname = $ctorNew"
+//  val copy = q"def copy(..$copyParams): $tname = new $tname(foo)"
+    val copy = q"def copy(..$copyParams): $tname = $ctorNew"
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
     val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
@@ -60,12 +65,19 @@ class data extends scala.annotation.StaticAnnotation {
 
     val asProduct = q"private def asProduct: $Product = $ProductImpl($tnameString, $IndexedSeq(foo))"
 
+    val applyParams = params1 map { p =>
+      val name @ Term.Name(_) = p.name
+      val Some(decltpe) = p.decltpe
+      param"$name: $decltpe"
+    }
+    val apply = q"def apply(..$applyParams): $tname = $ctorNew"
+
     val newStats = stats ++ withs :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
     val classDefn = q"..$newMods class $tname[..$tparams] ..$ctorMods (...$newParamss) extends $newTemplate"
 
-    val objectDef = q"object ${Term.Name(tnameString)} { def apply(foo: Int): $tname = $ctorNew }"
+    val objectDef = q"object ${Term.Name(tnameString)} { $apply }"
 
     Term.Block(sciSeq(classDefn, objectDef))
   }

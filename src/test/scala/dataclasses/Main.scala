@@ -4,6 +4,7 @@ package dataclasses
 
 @data class PrivateBippy1 private (foo: Int)
 @data class ValBippy1(val foo: Int)
+@data class LongBippy1(foo: Long)
 
 //@data class Bippy2(foo: Int, bar: String)
 
@@ -19,5 +20,8 @@ object Main {
     println(new Bippy1(1).copy(foo = 2))
     println(new Bippy1(1).withFoo(2))
     println(Bippy1(1))
+    println(new LongBippy1(1L))
+    println(new LongBippy1(1L).copy(foo = 2L))
+    println(LongBippy1(1L))
   }
 }
