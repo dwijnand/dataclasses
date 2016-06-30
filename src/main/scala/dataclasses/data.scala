@@ -29,6 +29,8 @@ class data extends scala.annotation.StaticAnnotation {
     val ProductImpl      = q"_root_.dataclasses.ProductImpl"
     val IndexedSeq       = q"_root_.scala.collection.immutable.IndexedSeq"
 
+    val newMods = mods withMod Mod.Final()
+
     val params1: sciSeq[Term.Param] = paramss.head
     val newParamss = (params1 map (_ withMod Mod.ValParam())) +: paramss.tail
 
@@ -68,7 +70,7 @@ class data extends scala.annotation.StaticAnnotation {
     val newStats = stats :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
-    q"..$mods class $tname[..$tparams](...$newParamss) extends $newTemplate"
+    q"..$newMods class $tname[..$tparams](...$newParamss) extends $newTemplate"
   }
 }
 
