@@ -5,12 +5,6 @@ import scala.meta._
 import scala.{ collection => sc }, sc.{ immutable => sci }, sci.{ Seq => sciSeq }
 import scala.runtime.ScalaRunTime
 
-//@data class Bippy1(foo: Int)
-
-//object Bippy {
-//  def apply(foo: Int): Bippy = new Bippy(foo)
-//}
-
 class data extends scala.annotation.StaticAnnotation {
   inline def apply(defn: Any) = meta {
     val q"..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends $template" = defn
@@ -24,9 +18,10 @@ class data extends scala.annotation.StaticAnnotation {
     val ProductImpl  = q"_root_.dataclasses.ProductImpl"
     val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
 
+    val params1: sciSeq[Term.Param] = paramss.head
+
     val newMods = mods withMod Mod.Final()
 
-    val params1: sciSeq[Term.Param] = paramss.head
     val newParamss = (params1 map (_ withMod Mod.ValParam())) +: paramss.tail
 
     val withs = params1 map { p =>
@@ -36,14 +31,25 @@ class data extends scala.annotation.StaticAnnotation {
       q"def $withName($name: $decltpe = $name): $tname = copy($name = $name)"
     }
 
+    val args = params1 map { p =>
+      val name @ Term.Name(_) = p.name
+      arg"$name"
+    }
+
     val copyParams = params1 map { p =>
       val name @ Term.Name(_) = p.name
       val Some(decltpe) = p.decltpe
       param"$name: $decltpe = $name"
     }
 
+    val applyParams = params1 map { p =>
+      val name @ Term.Name(_) = p.name
+      val Some(decltpe) = p.decltpe
+      param"$name: $decltpe"
+    }
+
     val ctorRefName = Ctor.Ref.Name(tnameString)
-    val ctorApply = q"$ctorRefName(foo)"
+    val ctorApply = q"$ctorRefName(..$args)"
     val ctorNew = Term.New(
       Template(
         Nil,
@@ -53,7 +59,7 @@ class data extends scala.annotation.StaticAnnotation {
       )
     )
 
-//  val copy = q"def copy(..$copyParams): $tname = new $tname(foo)"
+//  val copy = q"def copy(..$copyParams): $tname = new $tname(..$args)"
     val copy = q"def copy(..$copyParams): $tname = $ctorNew"
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
@@ -63,13 +69,8 @@ class data extends scala.annotation.StaticAnnotation {
       case _            => false
       })"""
 
-    val asProduct = q"private def asProduct: $Product = $ProductImpl($tnameString, $IndexedSeq(foo))"
+    val asProduct = q"private def asProduct: $Product = $ProductImpl($tnameString, $IndexedSeq(..$args))"
 
-    val applyParams = params1 map { p =>
-      val name @ Term.Name(_) = p.name
-      val Some(decltpe) = p.decltpe
-      param"$name: $decltpe"
-    }
     val apply = q"def apply(..$applyParams): $tname = $ctorNew"
 
     val newStats = stats ++ withs :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
