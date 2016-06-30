@@ -2,6 +2,8 @@ package dataclasses
 
 import scala.meta._
 
+import scala.collection.immutable
+
 //@data class Bippy1(foo: Int)
 
 //final class Bippy(val foo: Int) {
@@ -20,12 +22,16 @@ class data extends scala.annotation.StaticAnnotation {
     val q"..$mods class $tname[..$tparams](...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
-    val ProductImpl = q"_root_.dataclasses.ProductImpl"
-    val IndexedSeq = q"_root_.scala.collection.immutable.IndexedSeq"
     val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
-    val AnyRef = t"_root_.scala.AnyRef"
+    val AnyRef       = t"_root_.scala.AnyRef"
+    val ProductImpl  = q"_root_.dataclasses.ProductImpl"
+    val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
 
-    val newParams1 = paramss.head.map(param => param.copy(mods = param.mods :+ Mod.ValParam()))
+    val params: immutable.Seq[Term.Param] = paramss.head
+    val newParams1 = params.map(param =>
+      if (param.mods exists { case mod"valparam" => true; case _ => false }) param
+      else param.copy(mods = param.mods :+ mod"valparam")
+    )
     val newParamss = newParams1 +: paramss.tail
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
@@ -34,9 +40,11 @@ class data extends scala.annotation.StaticAnnotation {
       case that: $tname => $ScalaRunTime._equals(this.asProduct, that.asProduct)
       case _            => false
       })"""
+
     val asProduct = q"private def asProduct: _root_.scala.Product = $ProductImpl(${tname.value}, $IndexedSeq(foo))"
 
     val newStats = stats :+ toString :+ hashCode :+ equals :+ asProduct
+
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
     q"..$mods class $tname[..$tparams](...$newParamss) extends $newTemplate"
   }
