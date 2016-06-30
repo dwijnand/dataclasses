@@ -34,6 +34,8 @@ class data extends scala.annotation.StaticAnnotation {
     )
     val newParamss = newParams1 +: paramss.tail
 
+    val copy = q"def copy(foo: Int = foo): Bippy1 = new Bippy1(foo)"
+
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
     val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
     val equals = q"""override def equals(that: _root_.scala.Any) = (this eq that.asInstanceOf[$AnyRef]) || (that match {
@@ -43,7 +45,7 @@ class data extends scala.annotation.StaticAnnotation {
 
     val asProduct = q"private def asProduct: _root_.scala.Product = $ProductImpl(${tname.value}, $IndexedSeq(foo))"
 
-    val newStats = stats :+ toString :+ hashCode :+ equals :+ asProduct
+    val newStats = stats :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
     q"..$mods class $tname[..$tparams](...$newParamss) extends $newTemplate"
