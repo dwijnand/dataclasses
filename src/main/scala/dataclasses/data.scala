@@ -34,7 +34,29 @@ class data extends scala.annotation.StaticAnnotation {
     )
     val newParamss = newParams1 +: paramss.tail
 
-    val copy = q"def copy(foo: Int = foo): Bippy1 = new Bippy1(foo)"
+//  val copy = q"def copy(foo: Int = foo): $tname = new $tname(foo)"
+
+    val fooParam = param"foo: _root_.scala.Int = foo"
+
+    val ctorRefName = Ctor.Ref.Name(tname.value)
+    val ctorApply = q"$ctorRefName(foo)"
+    val copyBody = Term.New(
+      Template(
+        Nil,
+        sciSeq(ctorApply),
+        Term.Param(Nil, Name.Anonymous(), None, None),
+        None
+      )
+    )
+
+    val copy = Defn.Def(
+      Nil,
+      Term.Name("copy"),
+      Nil,
+      sciSeq(sciSeq(fooParam)),
+      Some(tname),
+      copyBody
+    )
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
     val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
