@@ -36,6 +36,13 @@ class data extends scala.annotation.StaticAnnotation {
     val params1: sciSeq[Term.Param] = paramss.head
     val newParamss = (params1 map (_ withMod Mod.ValParam())) +: paramss.tail
 
+    val withs = params1 map { p =>
+      val name @ Term.Name(_) = p.name
+      val Some(decltpe) = p.decltpe
+      val withName = Term.Name("with" + name.value.capitalize)
+      q"def $withName($name: $decltpe = $name): $tname = copy($name = $name)"
+    }
+
     val ctorRefName = Ctor.Ref.Name(tnameString)
     val ctorApply = q"$ctorRefName(foo)"
     val copyBody = Term.New(
@@ -59,7 +66,7 @@ class data extends scala.annotation.StaticAnnotation {
 
     val asProduct = q"private def asProduct: $Product = $ProductImpl($tnameString, $IndexedSeq(foo))"
 
-    val newStats = stats :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
+    val newStats = stats ++ withs :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
     q"..$newMods class $tname[..$tparams] ..$ctorMods (...$newParamss) extends $newTemplate"
