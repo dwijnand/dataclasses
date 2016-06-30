@@ -2,7 +2,8 @@ package dataclasses
 
 import scala.meta._
 
-import scala.collection.immutable.{ Seq => sciSeq }
+import scala.{ collection => sc }, sc.{ immutable => sci }, sci.{ Seq => sciSeq }
+import scala.runtime.ScalaRunTime
 
 //@data class Bippy1(foo: Int)
 
@@ -23,17 +24,13 @@ class data extends scala.annotation.StaticAnnotation {
     val q"..$mods class $tname[..$tparams](...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
-    val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
-    val AnyRef       = t"_root_.scala.AnyRef"
-    val ProductImpl  = q"_root_.dataclasses.ProductImpl"
-    val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
+    val termScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
+    val AnyRef           = t"_root_.scala.AnyRef"
+    val ProductImpl      = q"_root_.dataclasses.ProductImpl"
+    val IndexedSeq       = q"_root_.scala.collection.immutable.IndexedSeq"
 
     val params1: sciSeq[Term.Param] = paramss.head
-    val newParams1 = params1.map(param =>
-      if (param.mods exists { case Mod.ValParam() => true; case _ => false }) param
-      else param.copy(mods = param.mods :+ Mod.ValParam())
-    )
-    val newParamss = newParams1 +: paramss.tail
+    val newParamss = (params1 map (_ withMod Mod.ValParam())) +: paramss.tail
 
 //  val copy = q"def copy(foo: Int = foo): $tname = new $tname(foo)"
 
@@ -59,10 +56,10 @@ class data extends scala.annotation.StaticAnnotation {
       copyBody
     )
 
-    val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
-    val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
+    val toString = q"override def toString = $termScalaRunTime._toString(asProduct)"
+    val hashCode = q"override def hashCode = $termScalaRunTime._hashCode(asProduct)"
     val equals = q"""override def equals(that: _root_.scala.Any) = (this eq that.asInstanceOf[$AnyRef]) || (that match {
-      case that: $tname => $ScalaRunTime._equals(this.asProduct, that.asProduct)
+      case that: $tname => $termScalaRunTime._equals(this.asProduct, that.asProduct)
       case _            => false
       })"""
 
@@ -72,5 +69,17 @@ class data extends scala.annotation.StaticAnnotation {
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
     q"..$mods class $tname[..$tparams](...$newParamss) extends $newTemplate"
+  }
+}
+
+object `package` {
+  implicit class ModWith_===(private val m: Mod) extends AnyVal {
+    def ===(mod: Mod) = ScalaRunTime._equals(mod, m)
+  }
+  implicit class ModsWithMod(private val mods: sciSeq[Mod]) extends AnyVal {
+    def withMod(mod: Mod) = if (mods exists (mod === _)) mods else mods :+ mod
+  }
+  implicit class TermParamWithMod(private val p: Term.Param) extends AnyVal {
+    def withMod(mod: Mod) = if (p.mods exists (mod === _)) p else p.copy(mods = p.mods :+ mod)
   }
 }
