@@ -19,9 +19,7 @@ import scala.runtime.ScalaRunTime
 
 class data extends scala.annotation.StaticAnnotation {
   inline def apply(defn: Any) = meta {
-    // TODO: Add back the constructor mod
-    // Fixed with https://github.com/scalameta/scalameta/pull/445 and in 1.1.0+
-    val q"..$mods class $tname[..$tparams](...$paramss) extends $template" = defn
+    val q"..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
     val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
@@ -70,7 +68,7 @@ class data extends scala.annotation.StaticAnnotation {
     val newStats = stats :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
     val newTemplate = template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$newStats }"
-    q"..$newMods class $tname[..$tparams](...$newParamss) extends $newTemplate"
+    q"..$newMods class $tname[..$tparams] ..$ctorMods (...$newParamss) extends $newTemplate"
   }
 }
 

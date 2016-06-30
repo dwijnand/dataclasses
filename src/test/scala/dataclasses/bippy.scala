@@ -2,6 +2,7 @@ package dataclasses
 
 @data class Bippy1(foo: Int)
 
+@data class PrivateBippy1 private (foo: Int)
 @data class ValBippy1(val foo: Int)
 
 //@data class Bippy2(foo: Int, bar: String)
