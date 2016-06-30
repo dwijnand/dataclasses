@@ -22,8 +22,12 @@ class data extends scala.annotation.StaticAnnotation {
     val q"..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends $template" = defn
     val template"{ ..$earlydefns } with ..$ctorcalls { $param => ..$stats }" = template
 
+    val tnameString  = tname.value
     val ScalaRunTime = q"_root_.scala.runtime.ScalaRunTime"
+    val Any          = t"_root_.scala.Any"
     val AnyRef       = t"_root_.scala.AnyRef"
+    val Int          = t"_root_.scala.Int"
+    val Product      = t"_root_.scala.Product"
     val ProductImpl  = q"_root_.dataclasses.ProductImpl"
     val IndexedSeq   = q"_root_.scala.collection.immutable.IndexedSeq"
 
@@ -32,11 +36,7 @@ class data extends scala.annotation.StaticAnnotation {
     val params1: sciSeq[Term.Param] = paramss.head
     val newParamss = (params1 map (_ withMod Mod.ValParam())) +: paramss.tail
 
-//  val copy = q"def copy(foo: Int = foo): $tname = new $tname(foo)"
-
-    val fooParam = param"foo: _root_.scala.Int = foo"
-
-    val ctorRefName = Ctor.Ref.Name(tname.value)
+    val ctorRefName = Ctor.Ref.Name(tnameString)
     val ctorApply = q"$ctorRefName(foo)"
     val copyBody = Term.New(
       Template(
@@ -47,23 +47,17 @@ class data extends scala.annotation.StaticAnnotation {
       )
     )
 
-    val copy = Defn.Def(
-      Nil,
-      Term.Name("copy"),
-      Nil,
-      sciSeq(sciSeq(fooParam)),
-      Some(tname),
-      copyBody
-    )
+//  val copy = q"def copy(foo: $Int = foo): $tname = new $tname(foo)"
+    val copy = q"def copy(foo: $Int = foo): $tname = $copyBody"
 
     val toString = q"override def toString = $ScalaRunTime._toString(asProduct)"
     val hashCode = q"override def hashCode = $ScalaRunTime._hashCode(asProduct)"
-    val equals = q"""override def equals(that: _root_.scala.Any) = (this eq that.asInstanceOf[$AnyRef]) || (that match {
+    val equals = q"""override def equals(that: $Any) = (this eq that.asInstanceOf[$AnyRef]) || (that match {
       case that: $tname => $ScalaRunTime._equals(this.asProduct, that.asProduct)
       case _            => false
       })"""
 
-    val asProduct = q"private def asProduct: _root_.scala.Product = $ProductImpl(${tname.value}, $IndexedSeq(foo))"
+    val asProduct = q"private def asProduct: $Product = $ProductImpl($tnameString, $IndexedSeq(foo))"
 
     val newStats = stats :+ copy :+ toString :+ hashCode :+ equals :+ asProduct
 
