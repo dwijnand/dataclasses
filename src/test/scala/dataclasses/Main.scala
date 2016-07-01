@@ -15,6 +15,10 @@ import dataclasses._
 
 @data class Bippy3(foo: Int, bar: String, baz: Boolean)
 
+@data abstract class AbstractBippy1(foo: Int)
+@data abstract class AbstractBippy2(override val foo: Int, bar: String) extends AbstractBippy1(foo)
+@data          class ConcreteBippy3(override val foo: Int, override val bar: String, baz: Boolean) extends AbstractBippy2(foo, bar)
+
 object Main {
   def main(args: Array[String]): Unit = {
     println(new Bippy0())
@@ -75,5 +79,8 @@ object Main {
     println(new Bippy3(1, "a", false).withBaz(true).withBar("b").withFoo(2))
     println(Bippy3(1, "b", false))
     println(Bippy3(1, "b", false) match { case Bippy3(foo, bar, baz) => List(foo, bar, baz) })
+
+    println(ConcreteBippy3(1, "a", false))
+    println(ConcreteBippy3(1, "a", false) match { case AbstractBippy2(foo, bar) => List(foo, bar) })
   }
 }
