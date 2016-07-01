@@ -7,7 +7,11 @@ import scala.runtime.ScalaRunTime
 
 // TODO: Add java.io.Serializable?
 class data extends scala.annotation.StaticAnnotation {
-  inline def apply(defn: Any) = meta {
+  inline def apply(defn: Any) = meta { DataMacros.impl(defn) }
+}
+
+object DataMacros {
+  def impl(defn: Stat): Stat = {
     val q"""
       ..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends { ..$earlyStats } with ..$ctorcalls {
         $selfParam =>
