@@ -42,11 +42,7 @@ dependencyOverrides += "org.scala-lang" % "scala-library"  % scalaVersion.value
 dependencyOverrides += "org.scala-lang" % "scala-reflect"  % scalaVersion.value
 dependencyOverrides += "org.scala-lang" % "scalap"         % scalaVersion.value
 
-val addMacroParadise = settingKey[Boolean]("Helper for https://github.com/scalameta/paradise/issues/10")
-addMacroParadise := true
-
-libraryDependencies += (
-  if (addMacroParadise.value) Option("org.scalamacros"  % "paradise"  % "3.0.0-SNAPSHOT" compilerPlugin()) else None)
+libraryDependencies += "org.scalamacros"  % "paradise"  % "3.0.0-SNAPSHOT" compilerPlugin()
 libraryDependencies += "org.scalameta"   %% "scalameta" % "1.1.0-SNAPSHOT"
 
 parallelExecution in Test := false // so printlns don't interwine

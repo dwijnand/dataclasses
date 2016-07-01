@@ -61,8 +61,9 @@ object MiscPlugin extends AutoPlugin {
       def for212Plus(alt: => A) = ifScalaLte(11)(_ getOrElse alt)
     }
 
+    private val crossVersionFull = CrossVersion.full // workaround sbt/librarymanagement#48
     implicit final class ModuleIDWithCompilerPlugin(val _m: ModuleID) extends AnyVal {
-      def compilerPlugin(): ModuleID = sbt.compilerPlugin(_m cross CrossVersion.full)
+      def compilerPlugin(): ModuleID = sbt.compilerPlugin(_m cross crossVersionFull)
     }
   }
   import autoImport._
