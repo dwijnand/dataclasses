@@ -1,4 +1,6 @@
-package dataclasses
+package dataclassestest
+
+import dataclasses._
 
 @data class Bippy0()
 
