@@ -19,6 +19,16 @@ import dataclasses._
 @data abstract class AbstractBippy2(override val foo: Int, bar: String) extends AbstractBippy1(foo)
 @data          class ConcreteBippy3(override val foo: Int, override val bar: String, baz: Boolean) extends AbstractBippy2(foo, bar)
 
+object GreetingDate {
+  val date = {
+    val df = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    df setTimeZone (java.util.TimeZone getTimeZone "UTC")
+    df parse "2016-07-01T21:30:00.000Z"
+  }
+}
+
+@data class Greeting(message: String, @since("0.2.0") date: java.util.Date = GreetingDate.date)
+
 object Main {
   def main(args: Array[String]): Unit = {
     println(new Bippy0())
@@ -82,5 +92,8 @@ object Main {
 
     println(ConcreteBippy3(1, "a", false))
     println(ConcreteBippy3(1, "a", false) match { case AbstractBippy2(foo, bar) => List(foo, bar) })
+
+    println(new Greeting("hi"))
+    println(Greeting("hi"))
   }
 }

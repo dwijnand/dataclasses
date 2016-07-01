@@ -86,7 +86,7 @@ object DataMacros {
 
     val unapplyAndExtractor = if (params.size <= 1) Nil else {
       val defDefns = params.zipWithIndex map { case (param, idx) =>
-        val Term.Param(_, name @ Term.Name(_), Some(decltpe @ Type.Name(_)), _) = param
+        val Term.Param(_, name @ Term.Name(_), Some(decltpe: Type), _) = param
         q"def ${Term.Name(s"_${idx + 1}")}: $decltpe = x.$name"
       }
       List(
