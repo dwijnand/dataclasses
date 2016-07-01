@@ -53,6 +53,7 @@ object Main {
     println(new Bippy2(1, "a").withFoo(2).withBar("b"))
     println(new Bippy2(1, "a").withBar("b").withFoo(2))
     println(Bippy2(1, "b"))
+    println(Bippy2(1, "b") match { case Bippy2(foo, bar) => List(foo, bar) })
 
     println(new Bippy3(1, "a", false))
     println(new Bippy3(1, "a", false).foo)
@@ -71,5 +72,6 @@ object Main {
     println(new Bippy3(1, "a", false).withFoo(2).withBar("b").withBaz(true))
     println(new Bippy3(1, "a", false).withBaz(true).withBar("b").withFoo(2))
     println(Bippy3(1, "b", false))
+    println(Bippy3(1, "b", false) match { case Bippy3(foo, bar, baz) => List(foo, bar, baz) })
   }
 }

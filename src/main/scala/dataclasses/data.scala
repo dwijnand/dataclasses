@@ -19,6 +19,7 @@ class data extends scala.annotation.StaticAnnotation {
 
     val Any           = t"_root_.scala.Any"
     val AnyRef        = t"_root_.scala.AnyRef"
+    val Boolean       = t"_root_.scala.Boolean"
     val sciIndexedSeq = q"_root_.scala.collection.immutable.IndexedSeq"
     val Product       = t"_root_.scala.Product"
     val ProductImpl   = q"_root_.dataclasses.ProductImpl"
@@ -38,9 +39,30 @@ class data extends scala.annotation.StaticAnnotation {
       q"def $withName($name: $decltpe = $name): $tname = copy($name = $name)"
     }
 
-    val ctorNew = Term.New(Template(Nil, sciSeq(q"$ctorref(..$aexprs)"), Term.Param(Nil, Name.Anonymous(), None, None), None))
+    def anonParam = Term.Param(Nil, Name.Anonymous(), None, None)
+
+    val ctorNew = Term.New(Template(Nil, sciSeq(q"$ctorref(..$aexprs)"), anonParam, None))
 
     val applyParams = params0 map (_ withoutMod Mod.ValParam())
+
+    val unapplyAndExtractor = if (params0.size <= 1) Nil else { // only 2+ because of https://issues.scala-lang.org/browse/SI-9836
+      val unapply = q"def unapply(x: $tname): Extractor = new Extractor(x)"
+
+      val isEmpty = q"def isEmpty: $Boolean = false"
+      val get = q"def get: Extractor = this"
+      val defs = params0.zipWithIndex map { case (Term.Param(_, name @ Term.Name(_), Some(decltpe), _), idx) =>
+        q"def ${Term.Name(s"_${idx + 1}")} = x.$name"
+      }
+      val extractor = q"""
+        final class Extractor(private val x: $tname) extends _root_.scala.AnyVal {
+          $isEmpty
+          ..$defs
+          $get
+        }
+      """
+
+      sciSeq(unapply, extractor)
+    }
 
     val classDefn = q"""
       ..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends { ..$earlyStats } with ..$ctorcalls { $selfParam =>
@@ -61,13 +83,15 @@ class data extends scala.annotation.StaticAnnotation {
       }
     """
 
-    val objectDef = q"""
+    val objectDefn = q"""
       object $name {
         def apply(..$applyParams): $tname = $ctorNew
+
+        ..$unapplyAndExtractor
       }
     """
 
-    Term.Block(sciSeq(classDefn, objectDef))
+    Term.Block(sciSeq(classDefn, objectDefn))
   }
 }
 
