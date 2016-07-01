@@ -39,7 +39,7 @@ class data extends scala.annotation.StaticAnnotation {
     def anonParam = Term.Param(Nil, Name.Anonymous(), None, None)
 
     val ctorref = Ctor.Ref.Name(tname.value)
-    val ctorNew = Term.New(Template(Nil, sciSeq(q"$ctorref(..$aexprs)"), anonParam, None))
+    val ctorNew = Term.New(Template(Nil, List(q"$ctorref(..$aexprs)"), anonParam, None))
 
     val classDefn = q"""
       ..$finalMods class $tname[..$tparams] ..$ctorMods (...$valParamss) extends { ..$earlyStats } with ..$ctorcalls { $selfParam =>
@@ -68,7 +68,7 @@ class data extends scala.annotation.StaticAnnotation {
         val Term.Param(_, name @ Term.Name(_), Some(decltpe @ Type.Name(_)), _) = param
         q"def ${Term.Name(s"_${idx + 1}")}: $decltpe = x.$name"
       }
-      sciSeq(
+      List(
         q"def unapply(x: $tname): Extractor = new Extractor(x)",
         q"""
           final class Extractor(private val x: $tname) extends _root_.scala.AnyVal {
