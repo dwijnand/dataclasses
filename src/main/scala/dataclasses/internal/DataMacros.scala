@@ -5,13 +5,18 @@ import scala.meta._
 
 // TODO: Add java.io.Serializable?
 object DataMacros {
-  def impl(defn: Stat): Stat = {
+  def impl(stat: Stat): Stat = stat match {
+    case classDefn: Defn.Class => classImpl(classDefn)
+    case _                     => sys error s"Unexpected Stat"
+  }
+
+  def classImpl(classDefn0: Defn.Class): Term.Block = {
     val q"""
       ..$mods class $tname[..$tparams] ..$ctorMods (...$paramss) extends { ..$earlyStats } with ..$ctorcalls {
         $selfParam =>
         ..$stats
       }
-    """ = defn
+    """ = classDefn0
 
     val Any           =    t"_root_.scala.Any"
     val AnyRef        =    t"_root_.scala.AnyRef"
