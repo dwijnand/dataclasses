@@ -14,13 +14,14 @@ class data extends scala.annotation.StaticAnnotation {
       }
     """ = defn
 
-    val Any           = t"_root_.scala.Any"
-    val AnyRef        = t"_root_.scala.AnyRef"
-    val Boolean       = t"_root_.scala.Boolean"
-    val sciIndexedSeq = q"_root_.scala.collection.immutable.IndexedSeq"
-    val Product       = t"_root_.scala.Product"
-    val ProductImpl   = q"_root_.dataclasses.ProductImpl"
-    val ScalaRunTime  = q"_root_.scala.runtime.ScalaRunTime"
+    val Any           =    t"_root_.scala.Any"
+    val AnyRef        =    t"_root_.scala.AnyRef"
+    val AnyVal        = ctor"_root_.scala.AnyVal"
+    val Boolean       =    t"_root_.scala.Boolean"
+    val sciIndexedSeq =    q"_root_.scala.collection.immutable.IndexedSeq"
+    val Product       =    t"_root_.scala.Product"
+    val ProductImpl   =    q"_root_.dataclasses.ProductImpl"
+    val ScalaRunTime  =    q"_root_.scala.runtime.ScalaRunTime"
 
     val finalMods = mods withMod Mod.Final()
 
@@ -71,10 +72,10 @@ class data extends scala.annotation.StaticAnnotation {
       List(
         q"def unapply(x: $tname): Extractor = new Extractor(x)",
         q"""
-          final class Extractor(private val x: $tname) extends _root_.scala.AnyVal {
-            ${q"def isEmpty: $Boolean = false"}
+          final class Extractor(private val x: $tname) extends $AnyVal {
+            def isEmpty: $Boolean = false
+            def get: Extractor = this
             ..$defDefns
-            ${q"def get: Extractor = this"}
           }
         """
       )
@@ -88,7 +89,7 @@ class data extends scala.annotation.StaticAnnotation {
       }
     """
 
-    Term.Block(sciSeq(classDefn, objectDefn))
+    q"$classDefn; $objectDefn"
   }
 }
 
