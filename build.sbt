@@ -48,6 +48,7 @@ libraryDependencies += "org.specs2"      %% "specs2-core"          % "3.8.4"    
 libraryDependencies += "org.specs2"      %% "specs2-matcher-extra" % "3.8.4"          % "test"
 
 parallelExecution in Test := false // so printlns don't interwine
+      logBuffered in Test := false
 
          fork in run := true
 cancelable in Global := true

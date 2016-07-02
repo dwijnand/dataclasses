@@ -81,6 +81,18 @@ object DataSpec extends Specification { def is = s2"""
     correct withFoo.withBar.withBaz           ${new Bippy3(1, "a", false).withFoo(2).withBar("b").withBaz(true) ==== new Bippy3(2, "b", true)}
     correct withBaz.withBar.withFoo           ${new Bippy3(1, "a", false).withBaz(true).withBar("b").withFoo(2) ==== new Bippy3(2, "b", true)}
     has an unapply                            ${Bippy3(1, "a", false) must beLike { case Bippy3(foo, bar, baz) => foo ==== 1 and bar ==== "a" and baz ==== false }}
+
+  @data abstract class AbstractBippy1(foo: Int)
+  @data abstract class AbstractBippy2(override val foo: Int, bar: String) extends AbstractBippy1(foo)
+  @data          class ConcreteBippy3(override val foo: Int, override val bar: String, baz: Boolean) extends AbstractBippy2(foo, bar)
+    can be constructed with apply (1) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[ConcreteBippy3]}
+    can be constructed with apply (2) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[AbstractBippy2]}
+    can be constructed with apply (3) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[AbstractBippy1]}
+    matches the 2-arity unapply       ${ConcreteBippy3(1, "a", false) must beLike { case AbstractBippy2(foo, bar) => foo ==== 1 and bar ==== "a" }}
+
+  @data class Greeting(message: String, @since("0.2.0") date: java.util.Date = GreetingDate.date)
+    can be constructed with just message with "new"   ${new Greeting("hi") must beAnInstanceOf[Greeting]}
+    can be constructed with just message with "apply" ${Greeting("hi") must beAnInstanceOf[Greeting]}
 """
 
   private def bippy0NoCopy = (typecheck("Bippy0().copy()")
