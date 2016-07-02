@@ -61,6 +61,26 @@ object DataSpec extends Specification { def is = s2"""
     correct withFoo.withBar           ${new Bippy2(1, "a").withFoo(2).withBar("b") ==== new Bippy2(2, "b")}
     correct withBar.withFoo           ${new Bippy2(1, "a").withBar("b").withFoo(2) ==== new Bippy2(2, "b")}
     has an unapply                    ${Bippy2(1, "a") must beLike { case Bippy2(foo, bar) => foo ==== 1 and bar ==== "a" }}
+
+  @data class Bippy3(foo: Int, bar: String, baz: Boolean)
+    can be constructed with "new"             ${new Bippy3(1, "a", false) must beAnInstanceOf[Bippy3]}
+    has the correct toString                  ${new Bippy3(1, "a", false).toString ==== "Bippy3(1, a, false)"}
+    two instances have the same ##            ${new Bippy3(1, "a", false).## ==== new Bippy3(1, "a", false).##}
+    two instances are equal                   ${new Bippy3(1, "a", false) ==== new Bippy3(1, "a", false)}
+    can be constructed with "apply"           ${Bippy3(1, "a", false) ==== new Bippy3(1, "a", false)}
+    exposes its underlying type               ${new Bippy3(1, "a", false).foo ==== 1}
+    exposes its underlying type               ${new Bippy3(1, "a", false).bar ==== "a"}
+    exposes its underlying type               ${new Bippy3(1, "a", false).baz ==== false}
+    has a copy method for foo                 ${new Bippy3(1, "a", false).copy(foo = 2).foo ==== 2}
+    has a copy method for bar                 ${new Bippy3(1, "a", false).copy(bar = "b").bar ==== "b"}
+    has a copy method for baz                 ${new Bippy3(1, "a", false).copy(baz = true).baz ==== true}
+    has a copy method for foo and bar and baz ${new Bippy3(1, "a", false).copy(foo = 2, bar = "b", baz = true) ==== new Bippy3(2, "b", true)}
+    has a withFoo method                      ${new Bippy3(1, "a", false).withFoo(2).foo ==== 2}
+    has a withBar method                      ${new Bippy3(1, "a", false).withBar("b").bar ==== "b"}
+    has a withBaz method                      ${new Bippy3(1, "a", false).withBaz(true).baz ==== true}
+    correct withFoo.withBar.withBaz           ${new Bippy3(1, "a", false).withFoo(2).withBar("b").withBaz(true) ==== new Bippy3(2, "b", true)}
+    correct withBaz.withBar.withFoo           ${new Bippy3(1, "a", false).withBaz(true).withBar("b").withFoo(2) ==== new Bippy3(2, "b", true)}
+    has an unapply                            ${Bippy3(1, "a", false) must beLike { case Bippy3(foo, bar, baz) => foo ==== 1 and bar ==== "a" and baz ==== false }}
 """
 
   private def bippy0NoCopy = (typecheck("Bippy0().copy()")
