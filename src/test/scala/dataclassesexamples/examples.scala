@@ -2,15 +2,11 @@ package dataclassesexamples
 
 import dataclasses._
 
-@data class Bippy0()
-
 @data class Bippy1(foo: Int)
-
 @data class LongBippy1(foo: Long)
 @data class BarBippy1(bar: Int)
-
+@data class Bippy0()
 @data class Bippy2(foo: Int, bar: String)
-
 @data class Bippy3(foo: Int, bar: String, baz: Boolean)
 
 @data abstract class AbstractBippy1(foo: Int)

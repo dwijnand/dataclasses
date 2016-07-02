@@ -4,22 +4,6 @@ import dataclassesexamples._
 
 object Main {
   def main(args: Array[String]): Unit = {
-    println(new Bippy2(1, "a"))
-    println(new Bippy2(1, "a").foo)
-    println(new Bippy2(1, "a").bar)
-    println(new Bippy2(1, "a").toString())
-    println(new Bippy2(1, "a").hashCode())
-    println(new Bippy2(1, "a").equals(new Bippy2(1, "a")))
-    println(new Bippy2(1, "a").copy(foo = 2))
-    println(new Bippy2(1, "a").copy(bar = "b"))
-    println(new Bippy2(1, "a").copy(foo = 2, bar = "b"))
-    println(new Bippy2(1, "a").withFoo(2))
-    println(new Bippy2(1, "a").withBar("b"))
-    println(new Bippy2(1, "a").withFoo(2).withBar("b"))
-    println(new Bippy2(1, "a").withBar("b").withFoo(2))
-    println(Bippy2(1, "b"))
-    println(Bippy2(1, "b") match { case Bippy2(foo, bar) => List(foo, bar) })
-
     println(new Bippy3(1, "a", false))
     println(new Bippy3(1, "a", false).foo)
     println(new Bippy3(1, "a", false).bar)
