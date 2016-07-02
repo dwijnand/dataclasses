@@ -42,8 +42,10 @@ dependencyOverrides += "org.scala-lang" % "scala-library"  % scalaVersion.value
 dependencyOverrides += "org.scala-lang" % "scala-reflect"  % scalaVersion.value
 dependencyOverrides += "org.scala-lang" % "scalap"         % scalaVersion.value
 
-libraryDependencies += "org.scalamacros"  % "paradise"  % "3.0.0-SNAPSHOT" compilerPlugin()
-libraryDependencies += "org.scalameta"   %% "scalameta" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalamacros"  % "paradise"             % "3.0.0-SNAPSHOT" compilerPlugin()
+libraryDependencies += "org.scalameta"   %% "scalameta"            % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.specs2"      %% "specs2-core"          % "3.8.4"          % "test"
+libraryDependencies += "org.specs2"      %% "specs2-matcher-extra" % "3.8.4"          % "test"
 
 parallelExecution in Test := false // so printlns don't interwine
 
