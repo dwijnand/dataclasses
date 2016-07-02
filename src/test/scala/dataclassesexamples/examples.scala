@@ -22,3 +22,5 @@ object GreetingDate {
 }
 
 @data class Greeting(message: String, @since("0.2.0") date: java.util.Date = GreetingDate.date)
+
+@data class Person(name: String, surname: String, @since("0.2.0") dob: java.util.Date = GreetingDate.date)
