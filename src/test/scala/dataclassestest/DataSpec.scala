@@ -4,9 +4,10 @@ import dataclassesexamples._
 import org.specs2._
 import org.specs2.execute._
 import org.specs2.execute.Typecheck._
+import org.specs2.main.NoArgProperties
 import org.specs2.matcher.TypecheckMatchers._
 
-object DataSpec extends Specification { def is = s2"""
+object DataSpec extends Specification with NoArgProperties { def is = s2"""
   The spec for @data
 
   # 1-arity class
