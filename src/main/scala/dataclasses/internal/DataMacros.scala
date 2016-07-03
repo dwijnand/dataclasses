@@ -43,7 +43,7 @@ object DataMacros {
       Term.New(Template(Nil, List(q"$ctorref(..$aexprs)"), anonParam, None))
     }
 
-    val withsAndCopy = if (isAbstract) Nil else {
+    val withsAndCopy = if (isAbstract || params.isEmpty) Nil else {
       val copyParams = params map { case Term.Param(_, name @ Term.Name(_), Some(decltpe), _) => param"$name: $decltpe = $name" }
       val      withs = params map { case Term.Param(_, name @ Term.Name(_), Some(decltpe), _) =>
         val withName = Term.Name("with" + name.value.capitalize)

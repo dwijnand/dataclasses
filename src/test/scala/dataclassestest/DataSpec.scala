@@ -119,7 +119,7 @@ object DataSpec extends Specification with NoArgProperties { def is = s2"""
     pendingUntilFixed "https://github.com/scalameta/paradise/issues/12")
 
   private def bippy0NoCopy = (typecheck("Bippy0().copy()")
-    must failWith("value copy is not a member of .*Bippy0") pendingUntilFixed "TODO")
+    must failWith("value copy is not a member of .*Bippy0"))
 
   private def bippy0NoUnapply = (typecheck("Bippy0() match { case Bippy0() => 1 }")
     must failWith("object Bippy0 is not a case class, nor does it have an unapply/unapplySeq member"))
