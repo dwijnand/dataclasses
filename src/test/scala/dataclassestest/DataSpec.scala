@@ -22,8 +22,9 @@ object DataSpec extends Specification { def is = s2"""
     doesn't have a unapply method   $bippy1NoUnapply
       because of https://issues.scala-lang.org/browse/SI-9836
 
-  can handle a constructor modifier ${typecheck("@dataclasses.data class PrivateBippy1 private (foo: Int)")}
-  can handle a ctor param modifier  ${typecheck("@dataclasses.data class ValBippy1(val foo: Int)")}
+  can handle a constructor modifier  ${typecheck("@dataclasses.data class PrivateBippy1 private (foo: Int)")}
+  can handle a ctor param modifier   ${typecheck("@dataclasses.data class ValBippy1(val foo: Int)")}
+  can't handle a pre-existing object $compBippy
 
   # Not Int
   @data class LongBippy1(foo: Long)
@@ -110,14 +111,17 @@ object DataSpec extends Specification { def is = s2"""
     can be deconstructed with 2-arity unapply         $personUnapply2
 """
 
+  private def bippy1NoUnapply = (typecheck("Bippy1(1) match { case Bippy1(_) => 1 }")
+    must failWith("object Bippy1 is not a case class, nor does it have an unapply/unapplySeq member"))
+
+  private def compBippy = (typecheck("@dataclasses.data class CompBippy(foo: Int); object CompBippy")
+    pendingUntilFixed "https://github.com/scalameta/paradise/issues/12")
+
   private def bippy0NoCopy = (typecheck("Bippy0().copy()")
     must failWith("value copy is not a member of .*Bippy0") pendingUntilFixed "TODO")
 
   private def bippy0NoUnapply = (typecheck("Bippy0() match { case Bippy0() => 1 }")
     must failWith("object Bippy0 is not a case class, nor does it have an unapply/unapplySeq member"))
-
-  private def bippy1NoUnapply = (typecheck("Bippy1(1) match { case Bippy1(_) => 1 }")
-    must failWith("object Bippy1 is not a case class, nor does it have an unapply/unapplySeq member"))
 
   private def bippy2Unapply =
     Bippy2(1, "a") must beLike { case Bippy2(foo, bar) => foo ==== 1 and bar ==== "a" }
