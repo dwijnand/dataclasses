@@ -66,7 +66,7 @@ object DataSpec extends Specification { def is = s2"""
     has a withBar method            ${new Bippy2(1, "a").withBar("b").bar ==== "b"}
     correct withFoo.withBar         ${new Bippy2(1, "a").withFoo(2).withBar("b") ==== new Bippy2(2, "b")}
     correct withBar.withFoo         ${new Bippy2(1, "a").withBar("b").withFoo(2) ==== new Bippy2(2, "b")}
-    has an unapply                  $bippy2Unapply
+    has an unapply                  $bippy2NoUnapply
 
   # 3-arity
   @data class Bippy3(foo: Int, bar: String, baz: Boolean)
@@ -87,7 +87,7 @@ object DataSpec extends Specification { def is = s2"""
     has a withBaz method            ${new Bippy3(1, "a", false).withBaz(true).baz ==== true}
     correct chained withs           $bippy3ChainedWiths
     correct chained withs reverse   $bippy3ChainedWithsReverse
-    has an unapply                  $bippy3Unapply
+    has an unapply                  $bippy3NoUnapply
 
   # abstract class, class hierarchy
   @data abstract class AbstractBippy1(foo: Int)
@@ -96,7 +96,7 @@ object DataSpec extends Specification { def is = s2"""
     can be constructed with apply (1) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[ConcreteBippy3]}
     can be constructed with apply (2) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[AbstractBippy2]}
     can be constructed with apply (3) ${ConcreteBippy3(1, "a", false) must beAnInstanceOf[AbstractBippy1]}
-    matches the 2-arity unapply       $concreteBippy3Unapply2
+    matches the 2-arity unapply       $concreteBippy3NoUnapply2
 
   # 1-arity -> 2-arity
   @data class Greeting(message: String, @since("0.2.0") date: java.util.Date = GreetingDate.date)
@@ -108,7 +108,7 @@ object DataSpec extends Specification { def is = s2"""
   @data class Person(name: String, surname: String, @since("0.2.0") dob: java.util.Date = GreetingDate.date)
     can be constructed with just message with "new"   ${new Person("john", "doe") must beAnInstanceOf[Person]}
     can be constructed with just message with "apply" ${Person("john", "doe") must beAnInstanceOf[Person]}
-    can be deconstructed with 2-arity unapply         $personUnapply2
+    can be deconstructed with 2-arity unapply         $personNoUnapply2
 """
 
   private def bippy1NoUnapply = (typecheck("Bippy1(1) match { case Bippy1(_) => 1 }")
@@ -123,8 +123,8 @@ object DataSpec extends Specification { def is = s2"""
   private def bippy0NoUnapply = (typecheck("Bippy0() match { case Bippy0() => 1 }")
     must failWith("object Bippy0 is not a case class, nor does it have an unapply/unapplySeq member"))
 
-  private def bippy2Unapply =
-    Bippy2(1, "a") must beLike { case Bippy2(foo, bar) => foo ==== 1 and bar ==== "a" }
+  private def bippy2NoUnapply = (typecheck("""Bippy2(1, "a") match { case Bippy2(foo, bar) => 1 }""")
+    must failWith("object Bippy2 is not a case class, nor does it have an unapply/unapplySeq member"))
 
   private def bippy3CopyAll =
     new Bippy3(1, "a", false).copy(foo = 2, bar = "b", baz = true) ==== new Bippy3(2, "b", true)
@@ -135,14 +135,15 @@ object DataSpec extends Specification { def is = s2"""
   private def bippy3ChainedWithsReverse =
     new Bippy3(1, "a", false).withBaz(true).withBar("b").withFoo(2) ==== new Bippy3(2, "b", true)
 
-  private def bippy3Unapply =
-    Bippy3(1, "a", false) must beLike { case Bippy3(foo, bar, baz) => foo ==== 1 and bar ==== "a" and baz ==== false }
+  private def bippy3NoUnapply = (
+    typecheck("""Bippy3(1, "a", false) match { case Bippy3(foo, bar, baz) => 1 }""")
+      must failWith("object Bippy3 is not a case class, nor does it have an unapply/unapplySeq member"))
 
-  private def concreteBippy3Unapply2 =
-    ConcreteBippy3(1, "a", false) must beLike { case AbstractBippy2(foo, bar) => foo ==== 1 and bar ==== "a" }
+  private def concreteBippy3NoUnapply2 = (
+    typecheck("""ConcreteBippy3(1, "a", false) match { case AbstractBippy2(foo, bar) => 1 }""")
+      must failWith("object AbstractBippy2 is not a case class, nor does it have an unapply/unapplySeq member"))
 
-  private def personUnapply2 = (
-    tc"""Person("john", "doe") must beLike { case Person(n, sn) => n ==== "john" and sn ==== "doe" }"""
-      pendingUntilFixed "FUUUU"
-  )
+  private def personNoUnapply2 = (
+    typecheck("""Person("john", "doe") must beLike { case Person(n, sn) => n ==== "john" and sn ==== "doe" }""")
+      must failWith("object Person is not a case class, nor does it have an unapply/unapplySeq member"))
 }

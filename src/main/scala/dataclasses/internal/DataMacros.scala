@@ -18,15 +18,13 @@ object DataMacros {
       }
     """ = classDefn0
 
-    val Any           =    t"_root_.scala.Any"
-    val AnyRef        =    t"_root_.scala.AnyRef"
-    val AnyVal        = ctor"_root_.scala.AnyVal"
-    val Boolean       =    t"_root_.scala.Boolean"
-    val Product       =    t"_root_.scala.Product"
-    val ProductImpl   =    q"_root_.dataclasses.ProductImpl"
-    val ScalaRunTime  =    q"_root_.scala.runtime.ScalaRunTime"
-    val scIterator    =    q"_root_.scala.collection.Iterator"
-    val sciIndexedSeq =    q"_root_.scala.collection.immutable.IndexedSeq"
+    val Any           = t"_root_.scala.Any"
+    val AnyRef        = t"_root_.scala.AnyRef"
+    val Product       = t"_root_.scala.Product"
+    val ProductImpl   = q"_root_.dataclasses.ProductImpl"
+    val ScalaRunTime  = q"_root_.scala.runtime.ScalaRunTime"
+    val scIterator    = q"_root_.scala.collection.Iterator"
+    val sciIndexedSeq = q"_root_.scala.collection.immutable.IndexedSeq"
 
     val isAbstract = mods exists (_ === Mod.Abstract())
 
@@ -84,27 +82,9 @@ object DataMacros {
       List(q"def apply(..$nonValParams): $tname = $ctorNew")
     }
 
-    val unapplyAndExtractor = if (params.size <= 1) Nil else { // only 2+ because of SI-9836
-      val defDefns = params.zipWithIndex map { case (param, idx) =>
-        val Term.Param(_, name @ Term.Name(_), Some(decltpe: Type), _) = param
-        q"def ${Term.Name(s"_${idx + 1}")}: $decltpe = x.$name"
-      }
-      List(
-        q"def unapply(x: $tname): Extractor = new Extractor(x)",
-        q"""
-          final class Extractor(private val x: $tname) extends $AnyVal {
-            def isEmpty: $Boolean = false
-            def get: Extractor = this
-            ..$defDefns
-          }
-        """
-      )
-    }
-
     val objectDefn = q"""
       object $name {
         ..$apply
-        ..$unapplyAndExtractor
       }
     """
 
