@@ -23,7 +23,6 @@ scalacOptions  += "-language:higherKinds"
 scalacOptions  += "-language:implicitConversions"
 scalacOptions  += "-language:postfixOps"
 scalacOptions  += "-Xfuture"
-scalacOptions  += "-Yinline-warnings"
 scalacOptions  += "-Yno-adapted-args"
 scalacOptions  += "-Ywarn-dead-code"
 scalacOptions  += "-Ywarn-numeric-widen"
@@ -47,7 +46,7 @@ libraryDependencies += "org.scalameta"   %% "scalameta"            % "1.1.0-SNAP
 libraryDependencies += "org.specs2"      %% "specs2-core"          % "3.8.4"          % "test"
 libraryDependencies += "org.specs2"      %% "specs2-matcher-extra" % "3.8.4"          % "test"
 
-parallelExecution in Test := false // so printlns don't interwine
+parallelExecution in Test := false // so printlns don't intertwine
       logBuffered in Test := false
 
          fork in run := true
