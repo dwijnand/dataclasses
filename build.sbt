@@ -4,7 +4,7 @@ organization in Global := "com.dwijnand"
      version in Global := "1.0.0-SNAPSHOT"
     licences in Global := Seq(Apache2)
    startYear in Global := Some(2016)
- description in Global := "A code generation library and sbt autoplugin growable and bincompat-friendly datatypes"
+ description in Global := "A library for growable and source/binary-compatible-friendly datatypes"
   developers in Global := List(Developer("dwijnand", "Dale Wijnand", "dale wijnand gmail com", url("https://dwijnand.com")))
      scmInfo in Global := Some(ScmInfo(url("https://github.com/dwijnand/dataclasses"), "scm:git:git@github.com:dwijnand/dataclasses.git"))
 
