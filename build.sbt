@@ -36,11 +36,6 @@ scalacOptions in (Test,    console) -= "-Ywarn-unused-import"
 resolvers += Resolver sonatypeRepo "snapshots"
 cleanKeepFiles ++= Seq("resolution-cache", "streams") map (target.value / _)
 
-dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value // sbt/sbt#2286
-dependencyOverrides += "org.scala-lang" % "scala-library"  % scalaVersion.value
-dependencyOverrides += "org.scala-lang" % "scala-reflect"  % scalaVersion.value
-dependencyOverrides += "org.scala-lang" % "scalap"         % scalaVersion.value
-
 libraryDependencies += "org.scalamacros"  % "paradise"             % "3.0.0-SNAPSHOT" compilerPlugin()
 libraryDependencies += "org.scalameta"   %% "scalameta"            % "1.1.0-SNAPSHOT"
 libraryDependencies += "org.specs2"      %% "specs2-core"          % "3.8.4"          % "test"
